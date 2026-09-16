@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo Comercial de Ubaté</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<nav class="navbar">
+  <div class="brand">🧭 SIC-Ubaté</div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+  <ul id="navLinks">
+    <li><a href="#inicio">Inicio</a></li>
+    <li><a href="#catalogo">Catálogo</a></li>
+    <li><a data-cat="lacteo">Lácteo</a></li>
+    <li><a data-cat="artesanal">Artesanal</a></li>
+    <li><a data-cat="gastronomico">Gastronómico</a></li>
+    <li><a data-cat="comida_rapida">Comida Rápida</a></li>
+    <li><a href="#" id="navPublish" class="role-link">🏪 Mi negocio</a></li>
+    <li><a href="#" id="navAdmin" class="role-link">🛠 Admin</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="auth-buttons" id="authButtons">
+      <button class="btn btn-outline" id="btnLogin">Iniciar sesión</button>
+      <button class="btn btn-solid" id="btnRegister">Registrarse</button>
+    </div>
+    <div class="user-chip" id="userChip">
+      <span class="avatar" id="userAvatar">U</span>
+      <span id="userName">Usuario</span>
+      <button id="btnLogout">Salir</button>
+    </div>
+    <button class="btn btn-icon cart-btn" id="cartBtn" aria-label="Ver carrito">
+      🛒<span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+</nav>
+
+<header id="inicio">
+  <h1>🧀 Catálogo Comercial de Ubaté</h1>
+  <p>Productos lácteos, artesanales, gastronómicos y de comida rápida de negocios locales · Sistema de Información Comercial para Ubaté (SIC-Ubaté)</p>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Buscar producto o negocio (ej. queso, ruana, hamburguesa)...">
+  <div class="chips" id="chips">
+    <button class="chip active" data-cat="todos">Todos</button>
+  </div>
+</div>
+
+<main id="catalogo">
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">No se encontraron productos con ese criterio.</div>
+</main>
+
+<footer>Proyecto académico · PGC · Universidad de Cundinamarca, Seccional Ubaté</footer>
+
+<!-- ===== Carrito (drawer lateral) ===== -->
+<div class="cart-overlay" id="cartOverlay">
+  <div class="cart-drawer">
+    <div class="cart-header">
+      <h2>🛒 Tu carrito</h2>
+      <button class="close" id="cartCloseBtn" aria-label="Cerrar carrito">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+      <div class="cart-total-row">
+        <span class="label">Total</span>
+        <span class="amount" id="cartTotal">$0</span>
+      </div>
+      <button class="btn btn-full" id="btnCheckout">Confirmar pedido</button>
+      <p class="field-hint" style="margin-top:8px; text-align:center;">Al confirmar, coordinas la entrega o recogida directamente con cada negocio.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Confirmación de pedido ===== -->
+<div class="overlay" id="overlay-orderConfirm">
+  <div class="modal">
+    <button class="close" data-close>✕</button>
+    <h2>✅ ¡Pedido confirmado!</h2>
+    <p class="subtitle">Guarda esta información para coordinar tu compra</p>
+    <div id="orderConfirmBody"></div>
+    <button class="btn btn-full" id="btnCloseOrderConfirm" style="margin-top:6px;">Listo</button>
+  </div>
+</div>
+
+<!-- ===== Modal: Iniciar sesión ===== -->
+<div class="overlay" id="overlay-login">
+  <div class="modal">
+    <button class="close" data-close>✕</button>
+    <h2>Iniciar sesión</h2>
+    <p class="subtitle">Accede a tu cuenta del Catálogo Comercial de Ubaté</p>
+    <div class="form-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">Correo electrónico</label>
+        <input type="email" id="loginEmail" required placeholder="tucorreo@ejemplo.com">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-full">Ingresar</button>
+    </form>
+    <div class="modal-switch">¿No tienes cuenta? <a data-switch-to="register">Regístrate aquí</a></div>
+  </div>
+</div>
+
+<!-- ===== Modal: Registro ===== -->
+<div class="overlay" id="overlay-register">
+  <div class="modal">
+    <button class="close" data-close>✕</button>
+    <h2>Crear cuenta</h2>
+    <p class="subtitle">Regístrate para comprar, o para publicar los productos de tu negocio</p>
+    <div class="form-error" id="registerError"></div>
+    <div class="form-success" id="registerSuccess"></div>
+    <form id="registerForm">
+      <div class="field">
+        <label for="regName">Nombre completo</label>
+        <input type="text" id="regName" required placeholder="Ej. María Fernanda Rojas">
+      </div>
+      <div class="field">
+        <label for="regEmail">Correo electrónico</label>
+        <input type="email" id="regEmail" required placeholder="tucorreo@ejemplo.com">
+      </div>
+      <div class="field">
+        <label for="regTipo">Tipo de cuenta</label>
+        <select id="regTipo">
+          <option value="cliente">Cliente / Comprador</option>
+          <option value="negocio">Dueño de negocio</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="regPassword">Contraseña</label>
+        <input type="password" id="regPassword" required placeholder="Mínimo 6 caracteres">
+        <div class="field-hint">Usa al menos 6 caracteres.</div>
+      </div>
+      <button type="submit" class="btn btn-full">Crear cuenta</button>
+    </form>
+    <div class="modal-switch">¿Ya tienes cuenta? <a data-switch-to="login">Inicia sesión</a></div>
+  </div>
+</div>
+
+<!-- ===== Modal: Publicar producto / Mis productos (negocio) ===== -->
+<div class="overlay" id="overlay-publish">
+  <div class="modal modal-wide">
+    <button class="close" data-close>✕</button>
+    <h2>🏪 Mi negocio</h2>
+    <p class="subtitle">Publica productos nuevos o gestiona los que ya tienes en el catálogo</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab-group="publish" data-tab="form">Publicar producto</button>
+      <button class="tab-btn" data-tab-group="publish" data-tab="mine">Mis productos</button>
+    </div>
+
+    <div class="tab-panel active" data-tab-panel-group="publish" data-tab-panel="form">
+      <div class="form-error" id="publishError"></div>
+      <div class="form-success" id="publishSuccess"></div>
+      <form id="publishForm">
+        <div class="field">
+          <label for="prodNombre">Nombre del producto</label>
+          <input type="text" id="prodNombre" required placeholder="Ej. Queso campesino 500g">
+        </div>
+        <div class="field">
+          <label for="prodDescripcion">Descripción (opcional)</label>
+          <textarea id="prodDescripcion" placeholder="Breve descripción del producto"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="prodPrecio">Precio (COP)</label>
+            <input type="number" id="prodPrecio" required min="0" step="500" placeholder="Ej. 13000">
+          </div>
+          <div class="field">
+            <label for="prodCategoria">Categoría</label>
+            <select id="prodCategoria" required></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Ícono del producto</label>
+          <div class="icon-picker" id="iconPicker"></div>
+        </div>
+        <button type="submit" class="btn btn-full">Publicar producto</button>
+      </form>
+    </div>
+
+    <div class="tab-panel" data-tab-panel-group="publish" data-tab-panel="mine">
+      <div id="misProductosBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Panel de administración ===== -->
+<div class="overlay" id="overlay-admin">
+  <div class="modal modal-wide">
+    <button class="close" data-close>✕</button>
+    <h2>🛠 Panel de administración</h2>
+    <p class="subtitle">Gestiona los negocios y categorías del catálogo</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab-group="admin" data-tab="negocios">Negocios</button>
+      <button class="tab-btn" data-tab-group="admin" data-tab="categorias">Categorías</button>
+    </div>
+
+    <div class="tab-panel active" data-tab-panel-group="admin" data-tab-panel="negocios">
+      <div id="adminNegociosBody"></div>
+    </div>
+
+    <div class="tab-panel" data-tab-panel-group="admin" data-tab-panel="categorias">
+      <form id="adminCatForm" style="margin-bottom:18px;">
+        <div class="form-error" id="adminCatError"></div>
+        <div class="field-row">
+          <div class="field">
+            <label for="adminCatNombre">Nombre</label>
+            <input type="text" id="adminCatNombre" required placeholder="Ej. Bebidas">
+          </div>
+          <div class="field">
+            <label for="adminCatSlug">Slug (sin espacios)</label>
+            <input type="text" id="adminCatSlug" required placeholder="Ej. bebidas">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-full">Agregar categoría</button>
+      </form>
+      <div id="adminCategoriasBody"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/icons.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
